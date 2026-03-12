@@ -10,21 +10,19 @@ class Game {
         ];
         this.pocketRadius = 38;
         this.coins = [];
-        this.particles = []; // Visual juice
+        this.particles = []; 
         this.striker = null;
         this.queen = null;
         
-        // Advanced Game States
-        this.state = 'menu'; // menu, placement, playing, gameover
+        this.state = 'menu'; 
         this.turn = 'player'; 
         this.playerScore = 0;
         this.aiScore = 0;
         
-        // Rules tracking
         this.isPiecesMoving = false;
         this.foulCommitted = false;
         this.scoredThisTurn = false;
-        this.queenState = 'on_board'; // on_board, pocketed_uncovered, covered
+        this.queenState = 'on_board'; 
         this.pocketedThisTurn = [];
     }
 
@@ -36,7 +34,6 @@ class Game {
         this.turn = 'player';
         this.queenState = 'on_board';
         
-        // Player Baseline Y: 650, AI Baseline Y: 150
         this.striker = new Coin(400, 650, 22, 1.5, '#ecf0f1', 'striker');
         this.coins.push(this.striker);
 
@@ -59,7 +56,6 @@ class Game {
     update() {
         if (this.state === 'gameover' || this.state === 'menu') return;
 
-        // Update particles
         for (let i = this.particles.length - 1; i >= 0; i--) {
             let p = this.particles[i];
             p.pos = p.pos.add(p.vel);
@@ -92,7 +88,6 @@ class Game {
             }
         }
 
-        // Turn ends when all pieces stop
         if (!this.isPiecesMoving && this.striker.vel.mag() === 0 && this.state === 'playing') {
             this.evaluateTurnEnd();
         }
@@ -113,7 +108,7 @@ class Game {
             if (this.turn === 'player') {
                 this.playerScore++; this.scoredThisTurn = true;
                 if (this.queenState === 'pocketed_uncovered') this.queenState = 'covered';
-            } else { this.turn = 'ai'; } // Penalty logic simplified
+            } else { this.turn = 'ai'; } 
         } else if (coin.type === 'black') {
             if (this.turn === 'ai') {
                 this.aiScore++; this.scoredThisTurn = true;
@@ -124,25 +119,21 @@ class Game {
     }
 
     evaluateTurnEnd() {
-        // Queen Covering Logic
         if (this.queenState === 'pocketed_uncovered' && !this.scoredThisTurn) {
-            // Failed to cover! Respawn queen.
             this.queen.active = true;
             this.queen.pos = new Vector(400, 400);
             this.queenState = 'on_board';
-            this.foulCommitted = true; // Lose turn
+            this.foulCommitted = true; 
         } else if (this.queenState === 'covered') {
-            // Success! Award points
             if (this.turn === 'player') this.playerScore += 3;
             else this.aiScore += 3;
-            this.queenState = 'scored'; // Prevent scoring again
+            this.queenState = 'scored'; 
         }
 
         if (!this.scoredThisTurn || this.foulCommitted) {
             this.turn = this.turn === 'player' ? 'ai' : 'player';
         }
 
-        // Setup for next turn placement
         this.striker.active = true;
         this.striker.pos = new Vector(400, this.turn === 'player' ? 650 : 150);
         this.state = 'placement';
