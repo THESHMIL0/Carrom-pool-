@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D Carrom Pool</title>
+    <title>2D Carrom Pool - Advanced Edition</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
         <div id="main-menu" class="overlay">
             <h1>Carrom Pool</h1>
+            <p style="color: #bbb; margin-bottom: 20px;">Sound requires interaction. Click to start!</p>
             <button id="btn-start">Start Game (vs AI)</button>
         </div>
         
         <div id="hud" class="hidden">
             <div class="score">Player: <span id="score-player">0</span></div>
-            <div id="turn-indicator">Player's Turn</div>
+            <div id="turn-indicator">Place Striker</div>
             <div class="score">AI: <span id="score-ai">0</span></div>
         </div>
+        
+        <div id="status-message" class="hidden">Cover the Queen!</div>
 
         <div id="game-over" class="overlay hidden">
             <h2 id="winner-text">You Win!</h2>
