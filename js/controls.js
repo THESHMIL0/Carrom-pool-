@@ -12,15 +12,19 @@ class Controls {
 
     initEvents() {
         this.canvas.addEventListener('mousedown', (e) => {
-            if (this.game.state !== 'playing' || this.game.turn !== 'player' || this.game.isPiecesMoving) return;
+            if (this.game.turn !== 'player' || this.game.isPiecesMoving) return;
             
             const rect = this.canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            let mouseVec = new Vector(mouseX, mouseY);
+            let mouseVec = new Vector(e.clientX - rect.left, e.clientY - rect.top);
 
-            // Check if clicking near the striker
-            if (mouseVec.sub(this.game.striker.pos).mag() < this.game.striker.radius * 2) {
+            if (this.game.state === 'placement') {
+                // Lock placement and enter playing state
+                this.game.state = 'playing';
+                this.game.updateUI();
+                return;
+            }
+
+            if (this.game.state === 'playing' && mouseVec.sub(this.game.striker.pos).mag() < this.game.striker.radius * 3) {
                 this.isDragging = true;
                 this.dragStart = mouseVec;
                 this.dragCurrent = mouseVec;
@@ -28,20 +32,27 @@ class Controls {
         });
 
         this.canvas.addEventListener('mousemove', (e) => {
-            if (!this.isDragging) return;
             const rect = this.canvas.getBoundingClientRect();
-            this.dragCurrent = new Vector(e.clientX - rect.left, e.clientY - rect.top);
+            let mouseVec = new Vector(e.clientX - rect.left, e.clientY - rect.top);
+
+            if (this.game.state === 'placement' && this.game.turn === 'player') {
+                // Slide striker along baseline (X bounds: 200 to 600)
+                this.game.striker.pos.x = Math.max(200, Math.min(600, mouseVec.x));
+            }
+
+            if (this.isDragging) {
+                this.dragCurrent = mouseVec;
+            }
         });
 
         this.canvas.addEventListener('mouseup', () => {
             if (!this.isDragging) return;
             this.isDragging = false;
             
-            // Calculate strike vector (opposite to drag direction)
             let pullVector = this.dragStart.sub(this.dragCurrent);
-            let power = Math.min(pullVector.mag() * 0.15, 30); // Cap max power
+            let power = Math.min(pullVector.mag() * 0.18, 35); 
             
-            if (power > 1) {
+            if (power > 2) {
                 let direction = pullVector.normalize();
                 this.game.striker.vel = direction.mult(power);
             }
@@ -49,9 +60,10 @@ class Controls {
     }
 
     renderAim() {
-        if (this.isDragging && !this.game.isPiecesMoving) {
+        if (this.isDragging && !this.game.isPiecesMoving && this.game.state === 'playing') {
             let pullVector = this.dragStart.sub(this.dragCurrent);
-            let aimDirection = this.game.striker.pos.add(pullVector);
+            // Extrapolate the line to show trajectory
+            let aimDirection = this.game.striker.pos.add(pullVector.normalize().mult(pullVector.mag() * 3));
             this.renderer.drawAimLine(this.game.striker.pos, aimDirection);
         }
     }
