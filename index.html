@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Carrom Pool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="main-menu" class="overlay">
+            <h1>Carrom Pool</h1>
+            <button id="btn-start">Start Game (vs AI)</button>
+        </div>
+        
+        <div id="hud" class="hidden">
+            <div class="score">Player: <span id="score-player">0</span></div>
+            <div id="turn-indicator">Player's Turn</div>
+            <div class="score">AI: <span id="score-ai">0</span></div>
+        </div>
+
+        <div id="game-over" class="overlay hidden">
+            <h2 id="winner-text">You Win!</h2>
+            <button id="btn-restart">Play Again</button>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="800"></canvas>
+    </div>
+
+    <script src="js/physics.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/controls.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
