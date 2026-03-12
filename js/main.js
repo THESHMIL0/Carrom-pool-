@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const controls = new Controls(canvas, game, renderer);
     const ai = new AI(game);
 
-    // --- ZERO-ASSET AUDIO SYNTHESIZER ---
     let audioCtx = null;
     
     function initAudio() {
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    // Attach globally so physics.js can call it
     window.playAudio = function(impact, type) {
         if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
@@ -31,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (type === 'wall') {
             osc.type = 'square';
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            vol *= 0.5; // Quieter thud
+            vol *= 0.5; 
         } else if (type === 'pocket') {
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(400, audioCtx.currentTime);
@@ -46,20 +44,27 @@ document.addEventListener('DOMContentLoaded', () => {
         osc.stop(audioCtx.currentTime + duration);
     };
 
-    // --- UI BINDINGS ---
-    document.getElementById('btn-start').addEventListener('click', () => {
-        initAudio(); // Browsers require a user click to enable audio!
+    function startGame(e) {
+        e.preventDefault();
+        initAudio(); 
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('hud').classList.remove('hidden');
         game.init();
-    });
+    }
 
-    document.getElementById('btn-restart').addEventListener('click', () => {
+    function restartGame(e) {
+        e.preventDefault();
         document.getElementById('game-over').classList.add('hidden');
         game.init();
-    });
+    }
 
-    // --- GAME LOOP ---
+    // Support both click and touch for UI
+    document.getElementById('btn-start').addEventListener('click', startGame);
+    document.getElementById('btn-start').addEventListener('touchstart', startGame, {passive: false});
+
+    document.getElementById('btn-restart').addEventListener('click', restartGame);
+    document.getElementById('btn-restart').addEventListener('touchstart', restartGame, {passive: false});
+
     function gameLoop() {
         game.update();
         ai.update();
